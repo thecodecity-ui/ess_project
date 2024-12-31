@@ -193,11 +193,15 @@ def custom_admin_home(request):
 
     managers = Manager.objects.all()
     employees = Employee.objects.all()
+    shift = Shift.objects.all()
+    department = Department.objects.all()
     # Collect other models as needed...
 
     context = {
         'managers': managers,
         'employees': employees,
+        'shift' : shift,
+        'department': department,
         # Add other context variables as needed...
     }
 
@@ -432,6 +436,33 @@ def update_manager(request, id):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# View Manager Profile
+@api_view(['GET'])
+def view_manager_profile(request, id):
+    manager = get_object_or_404(Manager, manager_id=id)
+    serializer = ManagerSerializer(manager)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# View Manager Profile
+@api_view(['GET'])
+def manager_list(request):
+    manager = Manager.objects.all()
+    serializer = ManagerSerializer(manager,many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Update Manager Profile
+@api_view(['PUT'])
+def update_manager_profile(request, id):
+    manager = get_object_or_404(Manager, manager_id=id)
+    serializer = ManagerSerializer(manager, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "Manager profile updated successfully."}, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 # Delete Manager
 @api_view(['DELETE'])
 def delete_manager(request, id):
@@ -498,6 +529,46 @@ def delete_supervisor(request, id):
         return Response({"message": "Supervisor deleted successfully!"}, status=status.HTTP_204_NO_CONTENT)
     except Manager.DoesNotExist:
         return Response({"error": "Superviosr not found."}, status=status.HTTP_404_NOT_FOUND) 
+
+# View Manager Profile
+@api_view(['GET'])
+def view_supervisor_profile(request, id):
+    supervisor = get_object_or_404(Supervisor, supervisor_id=id)
+    serializer = SupervisorSerializer(supervisor)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+# Update Manager Profile
+@api_view(['PUT'])
+def update_supervisor_profile(request, id):
+    supervisor = get_object_or_404(Manager, supervisor_id=id)
+    serializer = SupervisorSerializer(supervisor, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "Manager profile updated successfully."}, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)      
+
+
+# View Over all Supervisor Profile
+@api_view(['GET'])
+def supervisor_list(request):
+    supervisor = Supervisor.objects.all()
+    serializer = SupervisorSerializer(supervisor,many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Delete Supervisor
+@api_view(['DELETE'])
+def delete_supervisor_overall(request):
+    try:
+        supervisor = Supervisor.objects.all()
+        supervisor.delete()
+        return Response({"message": "Supervisor  table deleted successfully!"}, status=status.HTTP_204_NO_CONTENT)
+    except Manager.DoesNotExist:
+        return Response({"error": "Superviosr not found."}, status=status.HTTP_404_NOT_FOUND)     
     
 
 
@@ -553,24 +624,11 @@ def reset_password_supervisor(request, token):
         return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)     
     
 
-# View Manager Profile
-@api_view(['GET'])
-def view_supervisor_profile(request, id):
-    supervisor = get_object_or_404(Supervisor, supervisor_id=id)
-    serializer = SupervisorSerializer(supervisor)
-    return Response(serializer.data, status=status.HTTP_200_OK)
 
-# Update Manager Profile
-@api_view(['PUT'])
-def update_supervisor_profile(request, id):
-    supervisor = get_object_or_404(Manager, supervisor_id=id)
-    serializer = SupervisorSerializer(supervisor, data=request.data, partial=True)
 
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Manager profile updated successfully."}, status=status.HTTP_200_OK)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)      
+
+
 
 # Repeat for Employee
 @api_view(['POST'])
@@ -618,6 +676,46 @@ def update_employee(request, id):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# View Over all Supervisor Profile
+@api_view(['GET'])
+def employee_list(request):
+    employee = Employee.objects.all()
+    serializer = EmployeeSerializer(employee,many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# View Employee Profile
+@api_view(['GET'])
+def view_employee_profile(request, id):
+    employee = get_object_or_404(Employee, employee_id=id)
+    serializer = EmployeeSerializer(employee)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Update Employee Profile
+@api_view(['PUT'])
+def update_employee_profile(request, id):
+    try:
+        # Retrieve the employee object from the database
+        employee = get_object_or_404(Employee, employee_id=id)
+
+        # Log the incoming request data for debugging purposes
+        print("Incoming request data:", request.data)
+
+        # Serialize the data with the existing employee data
+        serializer = EmployeeSerializer(employee, data=request.data, partial=True)
+
+        # Check if the serializer is valid and log errors if any
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Profile updated successfully."}, status=status.HTTP_200_OK)
+        else:
+            # Log the validation errors for debugging
+            print("Serializer errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(f"Error updating profile: {str(e)}")
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 @api_view(['DELETE'])
 def delete_employee(request, id):
     try:
@@ -635,6 +733,18 @@ def add_department(request):
         serializer.save()
         return Response({"message": "Department added successfully!"}, status=status.HTTP_201_CREATED)
 
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def show_department(request, id):
+    department = Department.objects.get(id=id)
+    serializer = ShiftSerializer(department)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def overall_department(request):
+    department = Department.objects.all()
+    serializer = DepartmentSerializer(department,many=True)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
@@ -676,6 +786,18 @@ def update_shift(request, id):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def show_shift(request, id):
+    shift = Shift.objects.get(id=id)
+    serializer = ShiftSerializer(shift)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def overall_shift(request):
+    shift = Shift.objects.all()
+    serializer = ShiftSerializer(shift,many=True)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['DELETE'])
 def delete_shift(request, id):
     try:
@@ -703,6 +825,18 @@ def update_location(request, id):
         serializer.save()
         return Response({"message": "Location updated successfully!"}, status=status.HTTP_200_OK)
 
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def show_location(request, id):
+    location = Location.objects.get(id=id)
+    serializer = LocationSerializer(location)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def overall_location(request):
+    location = Location.objects.all()
+    serializer = LocationSerializer(location,many=True)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
@@ -832,6 +966,88 @@ def md_add_location(request):
         return Response({"message": "Location added successfully!"}, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def md_show_location(request, id):
+    location = Location.objects.get(id=id)
+    serializer = LocationSerializer(location)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def md_show_overall_location(request):
+    location = Location.objects.all()
+    serializer = LocationSerializer(location,many=True)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def md_show_shift(request, id):
+    shift = Shift.objects.get(id=id)
+    serializer = ShiftSerializer(shift)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def md_show_overall_shift(request):
+    shift = Shift.objects.all()
+    serializer = ShiftSerializer(shift,many=True)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def md_show_department(request, id):
+    department = Department.objects.get(id=id)
+    serializer = ShiftSerializer(department)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def md_show_overall_department(request):
+    department = Department.objects.all()
+    serializer = DepartmentSerializer(department,many=True)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def md_employee_list(request):
+    employee = Employee.objects.all()
+    serializer = EmployeeSerializer(employee,many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# View Employee Profile
+@api_view(['GET'])
+def md_view_employee_profile(request, id):
+    employee = get_object_or_404(Employee, employee_id=id)
+    serializer = EmployeeSerializer(employee)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def md_manager_list(request):
+    manager = Employee.objects.all()
+    serializer = EmployeeSerializer(manager,many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# View Employee Profile
+@api_view(['GET'])
+def md_view_manager_profile(request, id):
+    manager = get_object_or_404(Manager, manager_id=id)
+    serializer = ManagerSerializer(manager)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def md_supervisor_list(request):
+    supervisor = Supervisor.objects.all()
+    serializer = SupervisorSerializer(supervisor,many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# View Employee Profile
+@api_view(['GET'])
+def md_view_supervisor_profile(request, id):
+    supervisor = get_object_or_404(Supervisor, supervisor_id=id)
+    serializer = SupervisorSerializer(supervisor)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
 
 # #Delete functionality perform by mdfrom rest_framework import generics, status
 from rest_framework.response import Response
@@ -980,64 +1196,9 @@ from django.shortcuts import get_object_or_404
 from .models import Employee, Manager
 from .serializers import EmployeeSerializer, ManagerSerializer
 
-# View Employee Profile
-@api_view(['GET'])
-def view_employee_profile(request, id):
-    employee = get_object_or_404(Employee, employee_id=id)
-    serializer = EmployeeSerializer(employee)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-# Update Employee Profile
-@api_view(['PUT'])
-def update_employee_profile(request, id):
-    try:
-        # Retrieve the employee object from the database
-        employee = get_object_or_404(Employee, employee_id=id)
-
-        # Log the incoming request data for debugging purposes
-        print("Incoming request data:", request.data)
-
-        # Serialize the data with the existing employee data
-        serializer = EmployeeSerializer(employee, data=request.data, partial=True)
-
-        # Check if the serializer is valid and log errors if any
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Profile updated successfully."}, status=status.HTTP_200_OK)
-        else:
-            # Log the validation errors for debugging
-            print("Serializer errors:", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        print(f"Error updating profile: {str(e)}")
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# View Manager Profile
-@api_view(['GET'])
-def view_manager_profile(request, id):
-    manager = get_object_or_404(Manager, manager_id=id)
-    serializer = ManagerSerializer(manager)
-    return Response(serializer.data, status=status.HTTP_200_OK)
 
-# Update Manager Profile
-@api_view(['PUT'])
-def update_manager_profile(request, id):
-    manager = get_object_or_404(Manager, manager_id=id)
-    serializer = ManagerSerializer(manager, data=request.data, partial=True)
-
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Manager profile updated successfully."}, status=status.HTTP_200_OK)
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# View Manager Profile
-@api_view(['GET'])
-def view_supervisor_profile(request, id):
-    supervisor = get_object_or_404(Supervisor, supervisor_id=id)
-    serializer = SupervisorSerializer(supervisor)
-    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Update Manager Profile
 @api_view(['PUT'])
@@ -1185,19 +1346,35 @@ def send_news(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def view_news(request):
+def view_all_news(request):
     if request.method == "GET":
         all_news = News.objects.all().order_by('-date')
         serializer = NewsSerializer(all_news, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_news(request,id):
+    if request.method == "GET":
+        all_news = News.objects.get(id=id)
+        serializer = NewsSerializer(all_news)
+        return Response(serializer.data, status=status.HTTP_200_OK)    
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def self_service(request):
+def self_all_service(request):
     if request.method == "GET":
         tickets = Ticket.objects.all()
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def self_service(request,id):
+    if request.method == "GET":
+        tickets = Ticket.objects.get(id=id)
+        serializer = TicketSerializer(tickets)
+        return Response(serializer.data, status=status.HTTP_200_OK)    
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1236,11 +1413,19 @@ def add_ticket(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def self_request(request):
+def self_all_request(request):
     if request.method == "GET":
         all_requests = Requests.objects.all()
         serializer = RequestsSerializer(all_requests, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def self_request(request,id):
+    if request.method == "GET":
+        all_requests = Requests.objects.get(id=id)
+        serializer = RequestsSerializer(all_requests)
+        return Response(serializer.data, status=status.HTTP_200_OK)    
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -1252,13 +1437,24 @@ from .serializers import TodoSerializer
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def todo_list(request):
+def todo_all_list(request):
     """
     List all Todos.
     """
     todos = Todo.objects.all()
     serializer = TodoSerializer(todos, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def todo_list(request,id):
+    """
+    List all Todos.
+    """
+    todos = Todo.objects.get(id=id)
+    serializer = TodoSerializer(todos)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

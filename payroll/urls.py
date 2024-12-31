@@ -10,7 +10,7 @@ from .views import (ManagerPayrollHistoryAPIView,
                     ProcessPayrollAPIView, 
                     SupervisorPayrollHistoryAPIView, 
                     SupervisorPayrollNotificationView, 
-                    SupervisorProcessPayrollAPIView)
+                    SupervisorProcessPayrollAPIView, bonus_list_by_user)
 
 urlpatterns = [
     # URL for processing payroll
@@ -28,4 +28,9 @@ urlpatterns = [
     path('mark_bonus_paid/<int:bonus_id>/', views.mark_bonus_paid, name='mark_bonus_paid'),
     path('bonus_list/', views.bonus_list, name='bonus_list'),
     path('salary_history/', views.salary_history, name='salary_history'),
+     path('salary-history/all/', views.all_salary_history, name='all_salary_history'),
+     path('salary-history/<str:user_id>/', views.salary_history_by_id, name='salary_history_by_id'),
+     path('payroll-history/all/', views.all_payroll_history, name='all_payroll_history'),
+     path('payroll-history/<str:user_id>/', views.payroll_history, name='payroll_history'),
+      path('bonus-list/<int:user_id>/', bonus_list_by_user, name='bonus_list_by_user'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

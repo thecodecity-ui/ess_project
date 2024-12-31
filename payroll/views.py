@@ -218,6 +218,20 @@ class PayrollManagementFilter(filters.FilterSet):
     class Meta:
         model = PayrollManagement
         fields = ['user', 'month']
+        
+
+@api_view(['GET'])
+def payroll_history(request, user_id):
+    payroll = get_object_or_404(PayrollManagement, user_id=user_id)
+    serializer = PayrollManagementSerializer(payroll)
+    return Response(serializer.data, status=status.HTTP_200_OK)  
+
+
+@api_view(['GET'])
+def all_payroll_history(request):
+    payroll = PayrollManagement.objects.all() 
+    serializer = PayrollManagementSerializer(payroll,many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)        
 
 class PayrollHistoryAPIView(generics.ListAPIView):
     queryset = PayrollManagement.objects.all()
@@ -465,6 +479,18 @@ def bonus_list(request):
     serializer = BonusTypeSerializer(bonuses, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def bonus_list_by_user(request, user_id):
+    """
+    Retrieve the bonus list for a specific user by user_id.
+    """
+    bonuses = BonusType.objects.filter(user_id=user_id)  # Filter bonuses by user_id
+    if not bonuses.exists():
+        return Response({'detail': 'No bonuses found for the given user ID.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = BonusTypeSerializer(bonuses, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def salary_history(request):
@@ -485,3 +511,41 @@ def salary_history(request):
         'salary': salary_serializer.data,
         'bonuses': bonus_serializer.data
     }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def all_salary_history(request):
+    """
+    Retrieve salary and bonus history for all users.
+    """
+    salaries = Salary.objects.all()  # Fetch all salary records
+    bonuses = BonusType.objects.all()  # Fetch all bonus records
+
+    salary_serializer = SalarySerializer(salaries, many=True)  # Serialize all salary records
+    bonus_serializer = BonusTypeSerializer(bonuses, many=True)  # Serialize all bonus records
+
+    return Response({
+        'salaries': salary_serializer.data,
+        'bonuses': bonus_serializer.data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def salary_history_by_id(request, user_id):
+    """
+    Retrieve salary and bonus history for a specific user by user_id from the URL.
+    """
+    try:
+        salary = Salary.objects.filter(user_id=user_id)  # Filter salaries by user_id
+        bonuses = BonusType.objects.filter(user_id=user_id)  # Filter bonuses by user_id
+
+        salary_serializer = SalarySerializer(salary, many=True)
+        bonus_serializer = BonusTypeSerializer(bonuses, many=True)
+
+        return Response({
+            'salary': salary_serializer.data,
+            'bonuses': bonus_serializer.data
+        }, status=status.HTTP_200_OK)
+    except Salary.DoesNotExist:
+        return Response({'detail': 'Salary records not found for the given user ID.'}, status=status.HTTP_404_NOT_FOUND)
+    except BonusType.DoesNotExist:
+        return Response({'detail': 'Bonus records not found for the given user ID.'}, status=status.HTTP_404_NOT_FOUND)

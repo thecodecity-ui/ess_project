@@ -52,21 +52,10 @@ urlpatterns = [
     path('api/managers/<int:id>/update/', views.update_manager_profile, name='update_manager_profile'),
     path('api/manager/view_employee/', views.manager_view_employee_profile, name='manager_view_employee_profile'),
 
+   
     path('api/supervisor/<str:id>/', views.view_supervisor_profile, name='view_supervisor_profile'),
     path('api/supervisor/<str:id>/update/', views.update_supervisor_profile, name='update_supervisor_profile'),
-    #  # Attendance History
-    # path('admin/admin_manager_attendance_history/', views.admin_manager_attendance_history, name='admin_manager_attendance_history'),
-    # path('admin/admin_employee_attendance_history/', views.admin_employee_attendance_history, name='admin_employee_attendance_history'),
-    # #Weekly & Monthly chart for Manager from Admin
-    # path('admin/admin_manager_weekly_chart/', views.admin_manager_weekly_chart, name='admin_manager_weekly_chart'),
-    # path('admin/admin_manager_monthly_chart/', views.admin_manager_monthly_chart, name='admin_manager_monthly_chart'),
-    # #Weekly & Monthly chart for Employee from Admin
-    # path('admin/admin_employee_weekly_chart/', views.admin_employee_weekly_chart, name='admin_employee_weekly_chart'),
-    # path('admin/admin_employee_monthly_chart/', views.admin_employee_monthly_chart, name='admin_employee_monthly_chart'),
    
-    # # urls for MD
-    # # path('md/login/', views.md_login, name='md_login'),
-    # path('md/logout/', views.user_logout, name='user_logout'),
     path('md/home/', views.md_home, name='md_home'),
     path('md/add_manager/', views.md_add_manager, name='md_add_manager'),
     path('md/add_supervisor/', views.md_add_supervisor, name='md_add_supervisor'),
@@ -79,8 +68,8 @@ urlpatterns = [
     path('md/delete_department/<str:department_id>/', views.md_delete_department, name='md_delete_department'),
     path('md/delete_shift/<str:shift_number>/', views.md_delete_shift, name='md_delete_shift'),
     path('md/delete_location/<str:location_id>/', views.md_delete_location, name='md_delete_location'),
-    path('md/update_manager/<int:id>/', views.md_update_manager, name='md_update_manager'),
-    path('md/update_employee/<int:id>/', views.md_update_employee, name='md_update_employee'),
+    path('md/update_manager/<str:id>/', views.md_update_manager, name='md_update_manager'),
+    path('md/update_employee/<str:id>/', views.md_update_employee, name='md_update_employee'),
     path('md/update_department/<int:id>/', views.md_update_department, name='md_update_department'),
     path('md/update_shift/<int:id>/', views.md_update_shift, name='md_update_shift'),
     path('md/update_location/<int:id>/', views.md_update_location, name='md_update_location'),
@@ -92,23 +81,49 @@ urlpatterns = [
     path('requests/supervisor/', views.supervisor_view_allrequest, name='supervisor_view_allrequest'),
     path('requests/admin/', views.admin_view_request, name='admin_view_request'),
     
-    path('todos/', views.todo_list, name='todo_list'),              # GET: List all Todos
+    path('todos/', views.todo_all_list, name='todo_all_list'),              # GET: List all Todos
     path('todos/create/', views.todo_create, name='todo_create'),   # POST: Create a new Todo
     path('todos/<int:id>/toggle/', views.todo_toggle, name='todo_toggle'),  # PATCH: Toggle Todo
     path('todos/<int:id>/delete/', views.todo_delete, name='todo_delete'),  # DELETE: Delete Todo
     path('news/send/', views.send_news, name='send_news'),
-    path('news/view/', views.view_news, name='view_news'),
-    path('tickets/', views.self_service, name='self_service'),
+    path('news/view/', views.view_all_news, name='view_all_news'),
+    path('tickets/', views.self_all_service, name='self_all_service'),
     path('tickets/add/', views.add_ticket, name='add_ticket'),
     path('requests/', views.self_request, name='self_request'),
     
-    # #Attendance history for md, emp, man.
-    # path('md/md_manager_attendance_history/', views.md_manager_attendance_history, name='md_manager_attendance_history'),
-    # path('md/md_employee_attendance_history/', views.md_employee_attendance_history, name='md_employee_attendance_history'),
-    # #Weekly & Monthly chart for Manager from MD
-    # path('md/md_manager_weekly_chart/', views.md_manager_weekly_chart, name='md_manager_weekly_chart'),
-    # path('md/md_manager_monthly_chart/', views.md_manager_monthly_chart, name='md_manager_monthly_chart'),
-    # #Weekly & Monthly chart for Employee from MD
-    # path('md/md_employee_weekly_chart/', views.md_employee_weekly_chart, name='md_employee_weekly_chart'),
-    # path('md/md_employee_monthly_chart/', views.md_employee_monthly_chart, name='md_employee_monthly_chart'),
+    
+    # All get functions
+    path('todos/<int:id>', views.todo_list, name='todo_list'), 
+    path('news/view/<int:id>', views.view_news, name='view_news'),
+     path('tickets/<int:id>', views.self_service, name='self_service'),
+     
+     path('api/manager_list/', views.manager_list, name='manager_list'),
+      path('api/employee_list/', views.employee_list, name='employee_list'),
+      path('api/supervisor/', views.supervisor_list, name='supervisor_list'),
+      
+       
+      
+    #   ADMIN SHOW DETAILS
+      path('admin/show-departments/<int:id>', views.show_department, name='show_department'),
+       path('admin/overall-departments/', views.overall_department, name='overall_department'),
+        path('admin/show-shift/<int:id>', views.show_shift, name='showshift'),
+         path('admin/show-shift/', views.overall_shift, name='overall_shift'),
+          path('admin/overall-location/', views.overall_location, name='overall_overall'),
+          path('admin/show-location/<int:id>', views.show_location, name='show_location'),
+          
+        #   MD SHOW DETAILS
+     path('MD/show-departments/<int:id>', views.md_show_department, name='md_show_department'),
+       path('MD/overall-departments/', views.md_show_overall_department, name='md_show_overall_department'),
+        path('MD/show-shift/<int:id>', views.md_show_shift, name='showshift'),
+         path('MD/show-shift/', views.md_show_overall_shift, name='md_show_overall_shift'),
+          path('MD/overall-location/', views.md_show_overall_location, name='md_show_overall_location'),
+          path('MD/show-location/<int:id>', views.md_show_location, name='md_show_location'),
+          
+      path('api/md/md_manager_list/', views.md_manager_list, name='md_manager_list'),
+      path('api/md/md_employee_list/', views.md_employee_list, name='md_employee_list'),
+      path('api/md/md_supervisor/', views.md_supervisor_list, name='md_supervisor_list'),
+      
+      path('api/md/employees/<str:id>/', views.md_view_employee_profile, name='md_view_employee_profile'),
+      path('api/md/managers/<str:id>/', views.md_view_manager_profile, name='md_view_employee_profile'),
+      path('api/md/supervisors/<str:id>/', views.md_view_supervisor_profile, name='md_view_employee_profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
