@@ -24,12 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(7y7#dcke$n(vm08zlz2@7y@uzz4sw)bh)irmws$(^rmzj46vp'
 
 # SECURITY WARNING: don't run with debug turned on in production! 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '75e2-2401-4900-4d44-ff69-e-5ea3-804f-6b52.ngrok-free.app',
+    '*'
 ]
 
 
@@ -168,10 +166,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
+# STATIC_URL = 'static/'
+# STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
+# import os
+
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Or another directory of your choice
+
 
 # Add this to your settings.py
 STATIC_URL = '/static/'
