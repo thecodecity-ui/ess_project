@@ -676,21 +676,24 @@ def update_employee(request, id):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# View Over all Supervisor Profile
+# View all Employee Profiles
 @api_view(['GET'])
 def employee_list(request):
-    employee = Employee.objects.all()
-    serializer = EmployeeSerializer(employee,many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    try:
+        # Retrieve all employees from the database
+        employees = Employee.objects.all()
 
+        # Serialize the data (many=True because we're passing a queryset)
+        serializer = EmployeeSerializer(employees, many=True)
 
-# View Employee Profile
-@api_view(['GET'])
-def view_employee_profile(request, id):
-    employee = get_object_or_404(Employee, employee_id=id)
-    serializer = EmployeeSerializer(employee)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+        # Return the serialized employee data in the response
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    except Exception as e:
+        # In case of any unexpected errors
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    
 # Update Employee Profile
 @api_view(['PUT'])
 def update_employee_profile(request, id):
@@ -737,15 +740,28 @@ def add_department(request):
 
 @api_view(['GET'])
 def show_department(request, id):
-    department = Department.objects.get(id=id)
-    serializer = ShiftSerializer(department)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        department = Department.objects.get(id=id)
+        serializer = DepartmentSerializer(department)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Department.DoesNotExist:
+        return Response({"error": "Department not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def overall_department(request):
-    department = Department.objects.all()
-    serializer = DepartmentSerializer(department,many=True)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        # Fetch all department records from the database
+        departments = Department.objects.all()
+
+        # Serialize the department data (many=True indicates multiple objects)
+        serializer = DepartmentSerializer(departments, many=True)
+
+        # Return the serialized data as a response
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        # In case of any unexpected errors
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['PUT'])
 def update_department(request, id):
