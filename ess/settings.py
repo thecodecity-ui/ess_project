@@ -75,9 +75,7 @@ MIDDLEWARE = [
     
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Adjust to match your frontend URL
-]
+CORS_ALLOWED_ORIGINS = True
 
 ROOT_URLCONF = 'ess.urls'
 
