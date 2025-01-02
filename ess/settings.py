@@ -75,7 +75,17 @@ MIDDLEWARE = [
     
 ]
 
-CORS_ALLOWED_ORIGINS = True
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'https://ess-project-7yb1.onrender.com',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Adjust to match your frontend URL
+]
+
+
 
 ROOT_URLCONF = 'ess.urls'
 
