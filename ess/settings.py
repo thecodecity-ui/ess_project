@@ -71,19 +71,27 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS should be one of the first
+    
+    # Other middleware
     
 ]
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'https://ess-project-7yb1.onrender.com',
+    'localhost',                  # For local development
+    '127.0.0.1',                  # Localhost IP address
+    'ess-project-7yb1.onrender.com',  # Render app domain (without "https://")
 ]
 
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Adjust to match your frontend URL
+    'https://ess-project-7yb1.onrender.com',  # Allow CORS for your Render app
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_REPLACE_HTTPS_REFERER = True
+
 
 
 
