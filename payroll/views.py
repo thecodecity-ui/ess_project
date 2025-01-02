@@ -219,6 +219,7 @@ class PayrollManagementFilter(filters.FilterSet):
         model = PayrollManagement
         fields = ['user', 'month']
         
+from rest_framework.decorators import api_view        
 
 @api_view(['GET'])
 def payroll_history(request, user_id):
@@ -428,6 +429,7 @@ def create_salary(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+from rest_framework.decorators import api_view
 
 @api_view(['POST'])
 def create_bonus(request):

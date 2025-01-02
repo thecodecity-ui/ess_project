@@ -106,11 +106,11 @@ WSGI_APPLICATION = 'ess.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'defaultdb',
-        'USER': 'avnadmin',
-        'PASSWORD': 'AVNS_gJqH5H3-pMbO0vWcv8U',
-        'HOST': 'mysql-3a19ca01-ssudhakarg0-93bc.d.aivencloud.com',
-        'PORT': '12680',
+        'NAME': 'ess_api',
+        'USER': 'root',
+        'PASSWORD': '4646',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 

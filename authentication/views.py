@@ -27,8 +27,8 @@ from django.core.mail import send_mail
 # from django.core.exceptions import ValidationError
 import bcrypt
 
-def index(request):
-    return render(request, 'authentication/index.html')
+# def index(request):
+#     return render(request, 'authentication/index.html')
 
 from rest_framework import status
 from rest_framework.decorators import api_view

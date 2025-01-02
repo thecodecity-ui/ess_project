@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     #urls for Admin
-    path('', views.index, name='index'),
+    # path('', views.index, name='index'),
     path('admin/logout/', views.user_logout, name='user_logout'),
     path('admin/forgot_password/', views.forgot_password, name='forgot_password'),
     path('admin/reset_password/<str:token>/', views.reset_password, name='reset_password'),
@@ -118,7 +118,6 @@ urlpatterns = [
          path('MD/show-shift/', views.md_show_overall_shift, name='md_show_overall_shift'),
           path('MD/overall-location/', views.md_show_overall_location, name='md_show_overall_location'),
           path('MD/show-location/<int:id>', views.md_show_location, name='md_show_location'),
-          
       path('api/md/md_manager_list/', views.md_manager_list, name='md_manager_list'),
       path('api/md/md_employee_list/', views.md_employee_list, name='md_employee_list'),
       path('api/md/md_supervisor/', views.md_supervisor_list, name='md_supervisor_list'),
