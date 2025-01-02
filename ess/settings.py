@@ -26,10 +26,13 @@ SECRET_KEY = 'django-insecure-(7y7#dcke$n(vm08zlz2@7y@uzz4sw)bh)irmws$(^rmzj46vp
 # SECURITY WARNING: don't run with debug turned on in production! 
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    '*'
-]
-
+# ALLOWED_HOSTS = [
+#     # 'localhost',
+#     # '127.0.0.1',
+#     # '75e2-2401-4900-4d44-ff69-e-5ea3-804f-6b52.ngrok-free.app',
+#     "ess-backend-r506.onrender.com"
+# ]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -71,28 +74,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # CORS should be one of the first
-    
-    # Other middleware
+    'corsheaders.middleware.CorsMiddleware',
     
 ]
 
-ALLOWED_HOSTS = [
-    'localhost',                  # For local development
-    '127.0.0.1',                  # Localhost IP address
-    'ess-project-7yb1.onrender.com',  # Render app domain (without "https://")
-]
-
-
-CORS_ALLOWED_ORIGINS = [
-    'https://ess-project-7yb1.onrender.com',  # Allow CORS for your Render app
-]
-
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",  # Adjust to match your frontend URL
+# ]
 CORS_ALLOW_ALL_ORIGINS = True
-
-# CORS_REPLACE_HTTPS_REFERER = True
-
-
+# CORS_ALLOWED_ORIGINS = [
+#     "https://ess-backend-r506.onrender.com",
+#     "*"
+# ]
 
 
 ROOT_URLCONF = 'ess.urls'
@@ -121,7 +114,7 @@ WSGI_APPLICATION = 'ess.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+       'ENGINE': 'django.db.backends.mysql',
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
         'PASSWORD': 'AVNS_gJqH5H3-pMbO0vWcv8U',
@@ -182,17 +175,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-# STATIC_URL = 'static/'
+STATIC_URL = 'static/'
 
-# STATIC_URL = 'static/'
-# STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
-# import os
-
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Or another directory of your choice
-
+STATIC_URL = 'static/'
+STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
 
 # Add this to your settings.py
 STATIC_URL = '/static/'
@@ -200,7 +186,13 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Adjust the path as needed
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://employee-self-service-official.vercel.app/']
+
+# CSRF_TRUSTED_ORIGINS = [
+#     # 'https://75e2-2401-4900-4d44-ff69-e-5ea3-804f-6b52.ngrok-free.app',
+#     "* "
+# ]
+# CSRF_TRUSTED_ORIGINS = ["*"]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

@@ -39,81 +39,50 @@ import bcrypt
 
 @api_view(['POST'])
 def common_user_login(request):
-    serializer = LoginSerializer(data=request.data)
-    
-    if serializer.is_valid():
-        username = serializer.validated_data['username']
-        user_id = serializer.validated_data['user_id']
-        password = serializer.validated_data['password'].encode('utf-8')
-
-        # Try to authenticate as a Manager
-        try:
-            manager = Manager.objects.get(username=username, manager_id=user_id)
-            if bcrypt.checkpw(password, manager.password.encode('utf-8')):
-                request.session['user'] = username
-                request.session['user_id'] = user_id
-                request.session['email'] = manager.email
-                request.session['role'] = 'manager'
-                Message.objects.filter(receiver_id=user_id, is_delivered=False).update(is_delivered=True)
-                return Response({"message": "Login successful", "role": "manager"}, status=status.HTTP_200_OK)
-        except Manager.DoesNotExist:
-            pass
+    if request.method == 'POST':
+        serializer = LoginSerializer(data=request.data)
         
-        # Try to authenticate as a Supervisor
-        try:
-            supervisor = Supervisor.objects.get(username=username, supervisor_id=user_id)
-            if bcrypt.checkpw(password, supervisor.password.encode('utf-8')):
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            user_id = serializer.validated_data['user_id']
+            password = serializer.validated_data['password'].encode('utf-8')
+
+            # User models and their respective roles
+            user_roles = [
+                {'model': Manager, 'role': 'manager', 'id_field': 'manager_id'},
+                {'model': Supervisor, 'role': 'supervisor', 'id_field': 'supervisor_id'},
+                {'model': Employee, 'role': 'employee', 'id_field': 'employee_id'},
+                {'model': Admin, 'role': 'admin', 'id_field': 'user_id'},
+                {'model': ManagingDirector, 'role': 'md', 'id_field': 'user_id'},
+            ]
+
+            def authenticate_user(user_model, user_id_field, role):
+                try:
+                    user = user_model.objects.get(username=username, **{user_id_field: user_id})
+                    if bcrypt.checkpw(password, user.password.encode('utf-8')):
+                        set_session(request, user, role)
+                        Message.objects.filter(receiver_id=user_id, is_delivered=False).update(is_delivered=True)
+                        return Response({"message": f"Login successful", "role": role}, status=status.HTTP_200_OK)
+                except user_model.DoesNotExist:
+                    return None
+            
+            def set_session(request, user, role):
                 request.session['user'] = username
                 request.session['user_id'] = user_id
-                request.session['email'] = supervisor.email
-                request.session['role'] = 'supervisor'
-                Message.objects.filter(receiver_id=user_id, is_delivered=False).update(is_delivered=True)
-                return Response({"message": "Login successful", "role": "supervisor"}, status=status.HTTP_200_OK)
-        except Supervisor.DoesNotExist:
-            pass
+                request.session['role'] = role
+                if hasattr(user, 'email'):
+                    request.session['email'] = user.email
 
-        # Try to authenticate as an Employee
-        try:
-            employee = Employee.objects.get(username=username, employee_id=user_id)
-            if bcrypt.checkpw(password, employee.password.encode('utf-8')):
-                request.session['user'] = username
-                request.session['user_id'] = user_id
-                request.session['email'] = employee.email
-                request.session['role'] = 'employee'
-                Message.objects.filter(receiver_id=user_id, is_delivered=False).update(is_delivered=True)
-                return Response({"message": "Login successful", "role": "employee"}, status=status.HTTP_200_OK)
-        except Employee.DoesNotExist:
-            pass
+            # Attempt to authenticate against each role
+            for role_info in user_roles:
+                response = authenticate_user(role_info['model'], role_info['id_field'], role_info['role'])
+                if response:
+                    return response
 
-        # Try to authenticate as an Admin
-        try:
-            user = Admin.objects.get(username=username, user_id=user_id)
-            if bcrypt.checkpw(password, user.password.encode('utf-8')):
-                request.session['user'] = username
-                request.session['user_id'] = user_id
-                request.session['role'] = 'admin'
-                Message.objects.filter(receiver_id=username, is_delivered=False).update(is_delivered=True)
-                return Response({"message": "Login successful", "role": "admin"}, status=status.HTTP_200_OK)
-        except Admin.DoesNotExist:
-            pass
-        
-        
+            # If all authentication attempts fail
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # Try to authenticate as a Managing Director
-        try:
-            user = ManagingDirector.objects.get(username=username, user_id=user_id)
-            if bcrypt.checkpw(password, user.password.encode('utf-8')):
-                request.session['user'] = username
-                request.session['user_id'] = user_id
-                request.session['role'] = 'md'
-                return Response({"message": "Login successful", "role": "md"}, status=status.HTTP_200_OK)
-        except ManagingDirector.DoesNotExist:
-            pass
-
-        # If all authentication attempts fail
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -653,6 +622,23 @@ def add_employee(request):
 
     # If the serializer is not valid, return validation errors
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# View individual Employee Profile by Employee ID
+@api_view(['GET'])
+def view_employee_profile(request, id):
+    try:
+        # Retrieve the specific employee profile using get_object_or_404
+        employee = get_object_or_404(Employee, employee_id=id)
+
+        # Serialize the employee data
+        serializer = EmployeeSerializer(employee)
+
+        # Return the serialized data as the response
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        # Handle any potential errors
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['PUT'])
 def update_employee(request, id):
