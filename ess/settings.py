@@ -182,9 +182,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Adjust the path as needed
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://75e2-2401-4900-4d44-ff69-e-5ea3-804f-6b52.ngrok-free.app',
-]
+CSRF_TRUSTED_ORIGINS = ['https://employee-self-service-official.vercel.app/']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
